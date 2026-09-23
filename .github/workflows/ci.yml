@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      # Runs the example suite fully offline against recorded fixtures (no API key).
+      # Fails the job if any case that passes in the committed baseline stops passing.
+      - name: Example eval suite (replay mode)
+        run: npm run eval:example
+
+      # Self-check: a fixtures file that simulates a prompt/model regression
+      # must make the CLI exit with code 1.
+      - name: Regression detection self-check
+        run: |
+          set +e
+          npm run eval:example:regressed
+          code=$?
+          set -e
+          if [ "$code" -ne 1 ]; then
+            echo "expected exit code 1 for the regressed run, got $code"
+            exit 1
+          fi
+
+      - name: Upload eval reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-reports
+          path: reports/
+          if-no-files-found: ignore

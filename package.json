@@ -1,0 +1,54 @@
+{
+  "name": "llm-regression-evals",
+  "version": "0.1.0",
+  "description": "Regression-eval harness for LLM-powered features: declarative test cases, deterministic replay for CI, baseline diffing, JUnit output.",
+  "license": "MIT",
+  "author": "go-ai-now",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "llm-regression-evals": "dist/bin.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "eval:example": "node dist/bin.js examples/support-tickets/support-tickets.yaml --baseline examples/support-tickets/baseline.json --junit reports/junit.xml --json reports/report.json",
+    "eval:example:regressed": "node dist/bin.js examples/support-tickets/support-tickets.yaml --fixtures examples/support-tickets/support-tickets.regressed.fixtures.json --baseline examples/support-tickets/baseline.json --quiet"
+  },
+  "keywords": [
+    "llm",
+    "evals",
+    "regression-testing",
+    "anthropic",
+    "claude",
+    "ci",
+    "prompt-engineering"
+  ],
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
+    "ajv": "^8.20.0",
+    "yaml": "^2.9.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.4",
+    "typescript": "~7.0.2",
+    "vitest": "^5.0.1"
+  }
+}
